@@ -9,7 +9,7 @@ class Tables extends Component {
 			camas: [],
 			estado: null,
 			pabellones: [],
-			pabellonid: 1 
+			pabellonid: null
 		}
 	}
 
@@ -17,7 +17,7 @@ class Tables extends Component {
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//Este es el primero que se carga asi que parte con el All y por default las no ocupadas
 	componentDidMount() {
-		camasService.getAllCamas(this.state.estado,this.state.pabellonid)
+		camasService.getAllCamas(this.state.estado, this.state.pabellonid)
 			.then((response) => {
 				camasService.getAllIds()
 					.then((response) => {
@@ -41,8 +41,8 @@ class Tables extends Component {
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//En este abria que crear un if que use el getAll o el por pabellon
 	componentDidUpdate(prevProps, prevState) {
-		if ((prevState.estado !== this.state.estado)||(prevState.pabellonid !== this.state.pabellonid)) {
-			camasService.getAllCamas(this.state.estado,this.state.pabellonid)
+		if ((prevState.estado !== this.state.estado) || (prevState.pabellonid !== this.state.pabellonid)) {
+			camasService.getAllCamas(this.state.estado, this.state.pabellonid)
 				.then((response) => {
 					this.setState({
 						...this.state,
@@ -67,7 +67,7 @@ class Tables extends Component {
 				est = 'Si'
 			}
 			return (
-				<tr key={index} class="text-center">
+				<tr key={index} className="text-center">
 					<td>{cama.camaid}</td>
 					<td>{cama.idpabellon}</td>
 					<td>{est}</td>
@@ -84,53 +84,62 @@ class Tables extends Component {
 					<Col>
 						<Card small className="mb-4">
 							<CardHeader className="border-bottom">
-								<tr>
-									<th scope="col" className="border-0" style={{
-										textAlign:"center"
-									}}>
-										<h6 className="m-0">Listado de Camas</h6>
-									</th>
-								</tr>
-								<tr>
-									<th class="text-center">
-										<div class="dropdown">
-											<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												Pabellon
+								<table>
+									<tbody>
+										<tr>
+											<th scope="col" className="border-0" style={{
+												textAlign: "center"
+											}}>
+												<h6 className="m-0">Listado de Camas</h6>
+											</th>
+										</tr>
+										<tr>
+											<th className="text-center">
+												<div className="dropdown">
+													<button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+														Pabellon
   </button>
-											<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+													<div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-											{this.state.pabellones.map( pab => (
-												<a class="dropdown-item"  onClick={() => this.setState({
-													...this.state,
-													pabellonid: pab,
-												})}>{pab}</a>
-											))}
+														<button className="dropdown-item" onClick={() => this.setState({
+															...this.state,
+															pabellonid: null,
+														})}>---</button>
 
-											</div>
-										</div>
-									</th>
-									<th>
-										<div class="dropdown">
-											<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-												Ocupada
+														{this.state.pabellones.map(pab => (
+															<button  key={pab} className="dropdown-item" onClick={() => this.setState({
+																...this.state,
+																pabellonid: pab,
+															})}>{pab}</button>
+														))}
+
+													</div>
+												</div>
+											</th>
+											<th>
+												<div className="dropdown">
+													<button className="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+														Ocupada
 	                        </button>
-											<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-											<a class="dropdown-item" onClick={() => this.setState({
-													...this.state,
-													estado: null,
-												})}>--- </a>
-												<a class="dropdown-item" onClick={() => this.setState({
-													...this.state,
-													estado: true,
-												})}>Si</a>
-												<a class="dropdown-item" onClick={() => this.setState({
-													...this.state,
-													estado: false,
-												})}>No</a>
-											</div>
-										</div>
-									</th>
-								</tr>
+													<div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+														<button className="dropdown-item" onClick={() => this.setState({
+															...this.state,
+															estado: null,
+														})}>--- </button>
+														<button className="dropdown-item" onClick={() => this.setState({
+															...this.state,
+															estado: true,
+														})}>Si</button>
+														<button className="dropdown-item" onClick={() => this.setState({
+															...this.state,
+															estado: false,
+														})}>No</button>
+													</div>
+												</div>
+											</th>
+										</tr>
+									</tbody>
+								</table>
 							</CardHeader>
 							<CardBody className="p-0 pb-3">
 								<table className="table mb-0">
