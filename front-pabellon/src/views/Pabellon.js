@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import { CardBody } from 'shards-react';
+import pabellonService from '../services/pabellon.service';
 export default class Pabellon extends Component {
     constructor(props) {
         super(props);
@@ -10,14 +11,9 @@ export default class Pabellon extends Component {
     handleSubmit = (event) => {
         alert('A form was submitted: ' + this.state.capacidad);
 
-        fetch('https://pabellon-isw.herokuapp.com/api/v1/addPabellon', {
-            method: 'POST',
-            // We convert the React state to JSON and send it as the POST body
-            body: JSON.stringify(this.state.capacidad)
-        }).then(function (response) {
-            console.log(response)
-            return response.json();
-        });
+        pabellonService.postPabellon(this.state.capacidad);
+
+
 
         event.preventDefault();
     }
