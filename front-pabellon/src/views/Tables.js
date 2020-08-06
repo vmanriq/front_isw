@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "shards-react";
 import camasService from '../services/camas.service';
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
+
 class Tables extends Component {
 
 	constructor(props) {
@@ -11,7 +12,9 @@ class Tables extends Component {
 			estado: null,
 			pabellones: [],
 			pabellonid: null,
-			isOpen: false
+			isOpen: false,
+			liberado: 0,
+
 		}
 
 	}
@@ -46,7 +49,7 @@ class Tables extends Component {
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//En este abria que crear un if que use el getAll o el por pabellon
 	componentDidUpdate(prevProps, prevState) {
-		if ((prevState.estado !== this.state.estado) || (prevState.pabellonid !== this.state.pabellonid)) {
+		if ((prevState.estado !== this.state.estado) || (prevState.pabellonid !== this.state.pabellonid) || (prevState.liberado != this.state.liberado)) {
 			camasService.getAllCamas(this.state.estado, this.state.pabellonid)
 				.then((response) => {
 					this.setState({
@@ -55,6 +58,7 @@ class Tables extends Component {
 					})
 					console.log("camas", this.state.camas);
 					console.log("estado", this.state.estado);
+					console.log("esta3", this.state.liberado);
 				})
 		}
 	}
@@ -63,19 +67,48 @@ class Tables extends Component {
 
 
 
+
+
 	render() {
+		const buttonCama = (state, id) => {
+			console.log("wenaaaa")
+			if (state === 'Si') {
+				console.log(id);
+				camasService.updateCama(id);
+
+				document.getElementById("cama_" + id).classList.remove('btn-danger');
+				document.getElementById("cama_" + id).classList.add('btn-info');
+				document.getElementById("cama_" + id).innerHTML = "asignar";
+
+				this.setState({
+					...this.state,
+					liberado: this.state.liberado + 1,
+				})
+
+			}
+			else {
+				this.setState({
+					...this.state,
+					liberado: this.state.liberado + 1,
+				});
+				return this.openModal();
+			}
+		}
+
 		const { camas } = this.state;
 		//La parte que alimenta la tabla segun el json obtenido
 		const renderCama = (cama, index) => {
-			var est, dis;
+			var est, dis, text;
 			//Por alguna razon el false no se muestra en la tabla asi que lo pase a si o no
 			if (cama.ocupado === false) {
 				est = 'No';
-				dis = "btn btn-sm btn-info"
+				dis = "btn btn-sm btn-info";
+				text = "asginar"
 			}
 			else {
-				est = 'Si'
-				dis = "btn btn-sm btn-danger"
+				est = 'Si';
+				dis = "btn btn-sm  btn-danger";
+				text = "liberar";
 			}
 			return (
 				<tr key={index} className="text-center">
@@ -83,7 +116,7 @@ class Tables extends Component {
 					<td>{cama.idpabellon}</td>
 					<td>{est}</td>
 					<td>{cama.capacidad}</td>
-					<td> <Button className={dis} onClick={this.openModal}> {est === 'Si' ? "liberar" : "asignar"} </Button></td>
+					<td> <Button id={"cama_" + cama.camaid} className={dis} onClick={() => buttonCama(est, cama.camaid)}> {text} </Button></td>
 				</tr >
 			)
 		}
@@ -98,10 +131,13 @@ class Tables extends Component {
 						<Modal.Title>Asignar Cama Paciente</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
-						Woohoo, you're reading this text in a modal!
-						</Modal.Body>
+						<Form.Control type="number" placeholder="ID" min="0"></Form.Control>
+						<Form.Text className="text-muted">
+							Ingrese el ID del paciente a asignar
+                       </Form.Text>
+					</Modal.Body>
 					<Modal.Footer>
-						<Button variant="secondary" onClick={this.closeModal}>Close</Button>
+						<Button variant="secondary" className="btn btn-success" onClick={this.closeModal}>Asignar</Button>
 					</Modal.Footer>
 				</Modal>
 				{/* Default Light Table */}

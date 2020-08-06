@@ -2,9 +2,10 @@ import { api } from '../helpers';
 
 
 function postPabellon(capacidad_) {
-    api.post("addPabellon", { capacidad: capacidad_ }).then(function (response) {
-        console.log(response);
-    })
+    api.post("addPabellon", { capacidad: capacidad_ },
+        { crossDomain: true }).then(function (response) {
+            console.log(response);
+        })
         .catch(function (error) {
             console.log(error);
         });
