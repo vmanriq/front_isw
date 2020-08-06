@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "shards-react";
 import camasService from '../services/camas.service';
+import { Modal, Button } from "react-bootstrap";
 class Tables extends Component {
 
 	constructor(props) {
@@ -9,10 +10,14 @@ class Tables extends Component {
 			camas: [],
 			estado: null,
 			pabellones: [],
-			pabellonid: null
+			pabellonid: null,
+			isOpen: false
 		}
+
 	}
 
+	openModal = () => { this.setState({ ...this.state, isOpen: true }) }
+	closeModal = () => { this.setState({ ...this.state, isOpen: false }) }
 
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//Este es el primero que se carga asi que parte con el All y por default las no ocupadas
@@ -54,17 +59,23 @@ class Tables extends Component {
 		}
 	}
 
+
+
+
+
 	render() {
 		const { camas } = this.state;
 		//La parte que alimenta la tabla segun el json obtenido
 		const renderCama = (cama, index) => {
-			var est;
+			var est, dis;
 			//Por alguna razon el false no se muestra en la tabla asi que lo pase a si o no
 			if (cama.ocupado === false) {
 				est = 'No';
+				dis = "btn btn-sm btn-info"
 			}
 			else {
 				est = 'Si'
+				dis = "btn btn-sm btn-danger"
 			}
 			return (
 				<tr key={index} className="text-center">
@@ -72,15 +83,29 @@ class Tables extends Component {
 					<td>{cama.idpabellon}</td>
 					<td>{est}</td>
 					<td>{cama.capacidad}</td>
-				</tr>
+					<td> <Button className={dis} onClick={this.openModal}> {est === 'Si' ? "liberar" : "asignar"} </Button></td>
+				</tr >
 			)
 		}
 
 		return (
+
+
 			//La tabla hay que añadirle los dropdowns de estado y pabellon
-			<Container fluid className="main-content-container px-4">
+			<Container fluid className="main-content-container px-4" >
+				<Modal show={this.state.isOpen} onHide={this.closeModal}>
+					<Modal.Header closeButton>
+						<Modal.Title>Asignar Cama Paciente</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						Woohoo, you're reading this text in a modal!
+						</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={this.closeModal}>Close</Button>
+					</Modal.Footer>
+				</Modal>
 				{/* Default Light Table */}
-				<Row>
+				<Row >
 					<Col>
 						<Card small className="mb-4">
 							<CardHeader className="border-bottom">
@@ -107,7 +132,7 @@ class Tables extends Component {
 														})}>---</button>
 
 														{this.state.pabellones.map(pab => (
-															<button  key={pab} className="dropdown-item" onClick={() => this.setState({
+															<button key={pab} className="dropdown-item" onClick={() => this.setState({
 																...this.state,
 																pabellonid: pab,
 															})}>{pab}</button>
@@ -147,16 +172,19 @@ class Tables extends Component {
 										<tr>
 											<th scope="col" className="border-0 text-center">
 												Id Cama
-	    	                  </th>
+	    	                  				</th>
 											<th scope="col" className="border-0 text-center">
 												Id Pabellon
-	    	                  </th>
+	    	                				</th>
 											<th scope="col" className="border-0 text-center">
 												Ocupado
-	    	                  </th>
+	    	                  				</th>
 											<th scope="col" className="border-0 text-center">
 												Capacidad
-	    	                  </th>
+	    	                  				</th>
+											<th scope="col" className="border-0 text-center">
+												Acción
+	    	                  				</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -166,7 +194,7 @@ class Tables extends Component {
 							</CardBody>
 						</Card>
 					</Col>
-				</Row>
+				</Row >
 			</Container >
 		);
 	}
