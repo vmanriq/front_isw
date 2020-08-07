@@ -139,6 +139,17 @@ class Tables extends Component {
 			//return aux;
 		}
 
+		const renderDrop = (pabellones) => {
+			var arr = [];
+			for (let index = 0; index < pabellones.length; index++) {
+				let pab = pabellones[index];
+				arr.push(<button key={pab} className="dropdown-item" onClick={() => this.setState({
+					...this.state,
+					pabellonid: pab,
+				})}>{pab}</button>);
+			}
+			return arr;
+		}
 
 		//La parte que alimenta la tabla segun el json obtenido
 		const renderCama = (camas) => {
@@ -216,12 +227,7 @@ class Tables extends Component {
 															pabellonid: null,
 														})}>---</button>
 
-														{this.state.pabellones.map(pab => (
-															<button key={pab} className="dropdown-item" onClick={() => this.setState({
-																...this.state,
-																pabellonid: pab,
-															})}>{pab}</button>
-														))}
+														{renderDrop(this.state.pabellones)}
 
 													</div>
 												</div>
