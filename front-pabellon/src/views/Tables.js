@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container, Row, Col, Card, CardHeader, CardBody } from "shards-react";
 import camasService from '../services/camas.service';
 import { Modal, Button, Form } from "react-bootstrap";
+import axios from "axios";
 
 class Tables extends Component {
 
@@ -12,6 +13,7 @@ class Tables extends Component {
 			estado: null,
 			pabellones: [],
 			pabellonid: null,
+			id_cama_select: null,
 			isOpen: false,
 			liberado: 0,
 
@@ -46,10 +48,28 @@ class Tables extends Component {
 
 			})
 	}
+	checkPaciente = () => {
+		let id = document.getElementById("id_paciente").value;
+		axios.get("http://iswayudantia02072020.herokuapp.com/pacientes/" + id).then(response => {
+			console.log(response.status);
+			this.closeModal();
+			console.log(this.state);
+			//console.log(" id cama select ", this.state.id_cama_select);
+			camasService.updateCama(this.state.id_cama_select);
+			this.setState({
+				...this.state,
+				liberado: this.state.liberado + 2,
+			});
+
+		}).catch((error) => {
+			console.error("Error - " + error);
+			alert("No existe un paciente con este id");
+		});
+	}
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//En este abria que crear un if que use el getAll o el por pabellon
 	componentDidUpdate(prevProps, prevState) {
-		if ((prevState.estado !== this.state.estado) || (prevState.pabellonid !== this.state.pabellonid) || (prevState.liberado != this.state.liberado)) {
+		if ((prevState.estado !== this.state.estado) || (prevState.pabellonid !== this.state.pabellonid) || (prevState.liberado !== this.state.liberado)) {
 			camasService.getAllCamas(this.state.estado, this.state.pabellonid)
 				.then((response) => {
 					this.setState({
@@ -59,6 +79,7 @@ class Tables extends Component {
 					console.log("camas", this.state.camas);
 					console.log("estado", this.state.estado);
 					console.log("esta3", this.state.liberado);
+					console.log("id", this.state.id_cama_select);
 				})
 		}
 	}
@@ -70,8 +91,11 @@ class Tables extends Component {
 
 
 	render() {
+
+
 		const buttonCama = (state, id) => {
 			console.log("wenaaaa")
+			let aux = null;
 			if (state === 'Si') {
 				console.log(id);
 				camasService.updateCama(id);
@@ -82,17 +106,22 @@ class Tables extends Component {
 
 				this.setState({
 					...this.state,
-					liberado: this.state.liberado + 1,
+					liberado: this.state.liberado + 2,
+					id_cama_select: id,
 				})
 
 			}
 			else {
 				this.setState({
 					...this.state,
-					liberado: this.state.liberado + 1,
-				});
-				return this.openModal();
+					liberado: this.state.liberado + 2,
+					id_cama_select: id,
+					isOpen: true
+				})
+				//aux = this.openModal;
+				//return this.openModal();
 			}
+			//return aux;
 		}
 
 		const { camas } = this.state;
@@ -131,13 +160,13 @@ class Tables extends Component {
 						<Modal.Title>Asignar Cama Paciente</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
-						<Form.Control type="number" placeholder="ID" min="0"></Form.Control>
+						<Form.Control id="id_paciente" type="number" placeholder="ID" min="0"></Form.Control>
 						<Form.Text className="text-muted">
 							Ingrese el ID del paciente a asignar
                        </Form.Text>
 					</Modal.Body>
 					<Modal.Footer>
-						<Button variant="secondary" className="btn btn-success" onClick={this.closeModal}>Asignar</Button>
+						<Button variant="secondary" className="btn btn-success" onClick={this.checkPaciente}>Asignar</Button>
 					</Modal.Footer>
 				</Modal>
 				{/* Default Light Table */}
