@@ -20,6 +20,7 @@ function App() {
 
 	return (
 		<Router>
+
 			<NavigationBar></NavigationBar>
 			<Container>
 				<Row>
