@@ -126,29 +126,6 @@ class Tables extends Component {
 
 		const { camas } = this.state;
 		//La parte que alimenta la tabla segun el json obtenido
-		const renderCama = (cama, index) => {
-			var est, dis, text;
-			//Por alguna razon el false no se muestra en la tabla asi que lo pase a si o no
-			if (cama.ocupado === false) {
-				est = 'No';
-				dis = "btn btn-sm btn-info";
-				text = "asginar"
-			}
-			else {
-				est = 'Si';
-				dis = "btn btn-sm  btn-danger";
-				text = "liberar";
-			}
-			return (
-				<tr key={index} className="text-center">
-					<td>{cama.camaid}</td>
-					<td>{cama.idpabellon}</td>
-					<td>{est}</td>
-					<td>{cama.capacidad}</td>
-					<td> <Button id={"cama_" + cama.camaid} className={dis} onClick={() => buttonCama(est, cama.camaid)}> {text} </Button></td>
-				</tr >
-			)
-		}
 
 		return (
 
@@ -254,7 +231,13 @@ class Tables extends Component {
 									</thead>
 									<tbody>
 										{
-											this.state.camas.map(renderCama)}
+											this.state.camas.map(cam => (<tr className="text-center">
+												<td>{cam.camaid}</td>
+												<td>{cam.idpabellon}</td>
+												<td>"lul"</td>
+												<td>{cam.capacidad}</td>
+												<td> <Button id={"cama_" + cam.camaid} className={"btn btn-info"} onClick={() => buttonCama("si", cam.camaid)}> "nice" </Button></td>
+											</tr >))}
 									</tbody>
 								</table>
 							</CardBody>
