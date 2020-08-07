@@ -50,21 +50,27 @@ class Tables extends Component {
 	}
 	checkPaciente = () => {
 		let id = document.getElementById("id_paciente").value;
-		axios.get("http://iswayudantia02072020.herokuapp.com/pacientes/" + id).then(response => {
-			console.log(response.status);
-			this.closeModal();
-			console.log(this.state);
-			//console.log(" id cama select ", this.state.id_cama_select);
-			camasService.updateCama(this.state.id_cama_select);
-			this.setState({
-				...this.state,
-				liberado: this.state.liberado + 2,
-			});
+		if (id) {
+			axios.get("http://iswayudantia02072020.herokuapp.com/pacientes/" + id).then(response => {
+				console.log(response.status);
+				this.closeModal();
+				console.log(this.state);
+				//console.log(" id cama select ", this.state.id_cama_select);
+				camasService.updateCama(this.state.id_cama_select);
+				this.setState({
+					...this.state,
+					liberado: this.state.liberado + 2,
+				});
+				alert("Cama asignada correctamente");
 
-		}).catch((error) => {
-			console.error("Error - " + error);
-			alert("No existe un paciente con este id");
-		});
+			}).catch((error) => {
+				console.error("Error - " + error);
+				alert("No existe un paciente con este id");
+			});
+		}
+		else {
+			alert("Debe ingresar un id ");
+		}
 	}
 	//Para extraer las camas, en el servicio se deberia crear uno para filtrar por pabellon
 	//En este abria que crear un if que use el getAll o el por pabellon
@@ -94,8 +100,6 @@ class Tables extends Component {
 
 
 		const buttonCama = (state, id) => {
-			console.log("wenaaaa")
-			let aux = null;
 			if (state === 'Si') {
 				console.log(id);
 				camasService.updateCama(id);
@@ -104,6 +108,11 @@ class Tables extends Component {
 				document.getElementById("cama_" + id).classList.add('btn-info');
 				document.getElementById("cama_" + id).innerHTML = "asignar";
 
+				this.setState({
+					...this.state,
+					liberado: this.state.liberado + 2,
+					id_cama_select: id,
+				})
 				this.setState({
 					...this.state,
 					liberado: this.state.liberado + 2,
@@ -118,35 +127,57 @@ class Tables extends Component {
 					id_cama_select: id,
 					isOpen: true
 				})
+				this.setState({
+					...this.state,
+					liberado: this.state.liberado + 2,
+					id_cama_select: id,
+					isOpen: true
+				})
 				//aux = this.openModal;
 				//return this.openModal();
 			}
 			//return aux;
 		}
 
-		const { camas } = this.state;
-		//La parte que alimenta la tabla segun el json obtenido
-		const renderCama = (cama, index) => {
-			var est, dis, text;
-			//Por alguna razon el false no se muestra en la tabla asi que lo pase a si o no
-			if (cama.ocupado === false) {
-				est = 'No';
-				dis = "btn btn-sm btn-info";
-				text = "asginar"
+		const renderDrop = (pabellones) => {
+			var arr = [];
+			for (let index = 0; index < pabellones.length; index++) {
+				let pab = pabellones[index];
+				arr.push(<button key={pab} className="dropdown-item" onClick={() => this.setState({
+					...this.state,
+					pabellonid: pab,
+				})}>{pab}</button>);
 			}
-			else {
-				est = 'Si';
-				dis = "btn btn-sm  btn-danger";
-				text = "liberar";
+			return arr;
+		}
+
+		//La parte que alimenta la tabla segun el json obtenido
+		const renderCama = (camas) => {
+			var arr = [];
+			for (let index = 0; index < camas.length; index++) {
+				var est, dis, text;
+
+				//Por alguna razon el false no se muestra en la tabla asi que lo pase a si o no
+				if (camas[index].ocupado === false) {
+					est = 'No';
+					dis = "btn btn-sm btn-info";
+					text = "asginar"
+				}
+				else {
+					est = 'Si';
+					dis = "btn btn-sm  btn-danger";
+					text = "liberar";
+				}
+				arr.push(<tr key={index} className="text-center">
+					<td>{camas[index].camaid}</td>
+					<td>{camas[index].idpabellon}</td>
+					<td>{est}</td>
+					<td>{camas[index].capacidad}</td>
+					<td> <Button id={"cama_" + camas[index].camaid} className={dis} onClick={() => buttonCama(est, camas[index].camaid)}> {text} </Button></td>
+				</tr >)
 			}
 			return (
-				<tr key={index} className="text-center">
-					<td>{cama.camaid}</td>
-					<td>{cama.idpabellon}</td>
-					<td>{est}</td>
-					<td>{cama.capacidad}</td>
-					<td> <Button id={"cama_" + cama.camaid} className={dis} onClick={() => buttonCama(est, cama.camaid)}> {text} </Button></td>
-				</tr >
+				arr
 			)
 		}
 
@@ -160,7 +191,7 @@ class Tables extends Component {
 						<Modal.Title>Asignar Cama Paciente</Modal.Title>
 					</Modal.Header>
 					<Modal.Body>
-						<Form.Control id="id_paciente" type="number" placeholder="ID" min="0"></Form.Control>
+						<Form.Control required id="id_paciente" type="number" placeholder="ID" min="0"></Form.Control>
 						<Form.Text className="text-muted">
 							Ingrese el ID del paciente a asignar
                        </Form.Text>
@@ -196,12 +227,7 @@ class Tables extends Component {
 															pabellonid: null,
 														})}>---</button>
 
-														{this.state.pabellones.map(pab => (
-															<button key={pab} className="dropdown-item" onClick={() => this.setState({
-																...this.state,
-																pabellonid: pab,
-															})}>{pab}</button>
-														))}
+														{renderDrop(this.state.pabellones)}
 
 													</div>
 												</div>
@@ -253,7 +279,7 @@ class Tables extends Component {
 										</tr>
 									</thead>
 									<tbody>
-										{camas.map(renderCama)}
+										{renderCama(this.state.camas)}
 									</tbody>
 								</table>
 							</CardBody>

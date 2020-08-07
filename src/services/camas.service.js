@@ -26,8 +26,11 @@ function getAllIds() {
 }
 
 function updateCama(idcama) {
-	let response = api.put(`UpdateCamaState?idCama=${idcama}`);
-	console.log(response);
+	api.put(`UpdateCamaState?idCama=${idcama}`).then((response => console.log(response.status))).catch((error) => {
+		console.error("Error - " + error);
+		alert("No existe una cama con este id ");
+	});
+
 }
 
 const camasService = {
