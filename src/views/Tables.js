@@ -254,7 +254,7 @@ class Tables extends Component {
 									</thead>
 									<tbody>
 										{
-											camas.map(renderCama)}
+											this.state.camas.map(renderCama)}
 									</tbody>
 								</table>
 							</CardBody>
